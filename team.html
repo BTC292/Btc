@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC_IPHONE | Équipe</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+/* PALETTE DE COULEURS BTC_IPHONE */
+:root {
+    --bg-dark: #090b11;
+    --bg-gradient: linear-gradient(180deg, #121622 0%, #06070a 100%);
+    --card-dark: #121520;
+    --orange-primary: #ff6a3d;
+    --text-main: #ffffff;
+    --text-muted: #6b7588;
+    --accent-gradient: linear-gradient(135deg, #ff6a3d 0%, #9a4eff 100%);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg-dark);
+    background-image: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    padding-bottom: 100px;
+}
+
+/* EN-TÊTE */
+.header-profile {
+    padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-profile h1 {
+    font-size: 20px;
+    margin: 0;
+    font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* SECTION INVITATION STYLISÉE */
+.invite-card {
+    margin: 0 15px 25px;
+    background: var(--card-dark);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.label-mini {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.copy-wrapper {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 6px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.invite-link-text {
+    flex: 1;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #a5b4fc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-copy {
+    background: var(--accent-gradient);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-copy:active { transform: scale(0.95); }
+
+/* RÉSUMÉ DES GAINS */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.summary-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 15px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.01);
+}
+
+.summary-item .val {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.summary-item .tit { font-size: 11px; color: var(--text-muted); }
+
+/* NIVEAUX D'ÉQUIPE */
+.team-list { padding: 0 15px; }
+
+.level-card {
+    background: var(--card-dark);
+    border-radius: 20px;
+    margin-bottom: 12px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.level-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 106, 61, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+.level-info { flex: 1; }
+.level-info .name { font-weight: 700; font-size: 15px; margin-bottom: 3px; display: block; }
+.level-info .percent { font-size: 11px; color: var(--orange-primary); font-weight: 600; }
+
+.level-stats { text-align: right; }
+.level-stats .count { display: block; font-size: 16px; font-weight: 800; color: #fff; }
+.level-stats .money { display: block; font-size: 12px; color: #10b981; font-weight: 600; } /* Vert pour les gains */
+
+/* NAVIGATION BAS CLONE IPHONE */
+.nav-bar {
+    position: fixed; 
+    bottom: 0; 
+    width: 100%;
+    background: #0b0e17; 
+    display: flex; 
+    justify-content: space-around;
+    padding: 12px 0 28px; 
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-item { 
+    color: var(--text-muted); 
+    text-align: center; 
+    font-size: 11px; 
+    text-decoration: none; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-item.active { color: var(--orange-primary); }
+
+.nav-item i { 
+    display: block; 
+    font-size: 20px; 
+    font-style: normal; 
+}
+
+/* TOAST CLONE */
+#toast {
+    position: fixed; 
+    bottom: 100px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    background: var(--orange-primary); 
+    color: #fff;
+    padding: 10px 24px; 
+    border-radius: 30px; 
+    font-weight: 700;
+    font-size: 13px; 
+    display: none; 
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(255, 106, 61, 0.4);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header-profile">
+    <h1>BTC_IPHONE</h1>
+</div>
+
+<div class="invite-card">
+    <div class="label-mini">Lien de parrainage unique</div>
+    <div class="copy-wrapper">
+        <div class="invite-link-text" id="refLink">Chargement du lien...</div>
+        <button class="btn-copy" onclick="copyLink()">COPIER</button>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-item">
+            <span class="val" id="totalCom">0 XOF</span>
+            <span class="tit">Commissions Totales</span>
+        </div>
+        <div class="summary-item">
+            <span class="val" id="teamCount">0</span>
+            <span class="tit">Membres Actifs</span>
+        </div>
+    </div>
+</div>
+
+<div class="team-list">
+    <div class="label-mini" style="margin-left: 10px;">Détails par Niveaux</div>
+
+    <div class="level-card">
+        <div class="level-icon">👑</div>
+        <div class="level-info">
+            <span class="name">Niveau 1</span>
+            <span class="percent">Commission : 27%</span>
+        </div>
+        <div class="level-stats">
+            <span class="count" id="l1Count">0</span>
+            <span class="money" id="l1Rev">0 XOF</span>
+        </div>
+    </div>
+
+    <div class="level-card">
+        <div class="level-icon">💎</div>
+        <div class="level-info">
+            <span class="name">Niveau 2</span>
+            <span class="percent">Commission : 3%</span>
+        </div>
+        <div class="level-stats">
+            <span class="count" id="l2Count">0</span>
+            <span class="money" id="l2Rev">0 XOF</span>
+        </div>
+    </div>
+
+    <div class="level-card">
+        <div class="level-icon">⚡</div>
+        <div class="level-info">
+            <span class="name">Niveau 3</span>
+            <span class="percent">Commission : 2%</span>
+        </div>
+        <div class="level-stats">
+            <span class="count" id="l3Count">0</span>
+            <span class="money" id="l3Rev">0 XOF</span>
+        </div>
+    </div>
+</div>
+
+<div class="nav-bar">
+    <a href="dashboard.html" class="nav-item"><i>🏠</i>Accueil</a>
+    <a href="product.html" class="nav-item"><i>🎓</i>Investir</a>
+    <a href="#" class="nav-item active"><i>👥</i>Équipe</a>
+    <a href="account.html" class="nav-item"><i>👤</i>Profil</a>
+</div>
+
+<div id="toast">Lien copié avec succès !</div>
+
+<script>
+// CONFIGURATION SUPABASE
+const client = supabase.createClient(
+    "https://ycswpdydsgoqplkqtpsd.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inljc3dwZHlkc2dvcXBsa3F0cHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NjY4MTcsImV4cCI6MjA5MDU0MjgxN30.67bBMdHtcGFIJuZuY_Xd4hBN4hj86JjHVXGN3oPbKMA"
+);
+
+let userId = localStorage.getItem("user_id");
+
+async function loadData() {
+    if(!userId) return;
+
+    // 1. Récupérer le code de parrainage et générer le nouveau lien Render
+    const { data: user } = await client.from("users").select("referral_code").eq("id", userId).single();
+    if(user) {
+        document.getElementById("refLink").innerText = `https://btc-59ll.onrender.com/index.html?ref=${user.referral_code}`;
+    }
+
+    // 2. Récupérer l'équipe
+    const { data: team } = await client.from("users").select("id, referred_by");
+    const { data: commissions } = await client.from("commissions").select("*").eq("user_id", userId);
+
+    // Calcul des niveaux
+    let lvl1 = team ? team.filter(u => u.referred_by === userId) : [];
+    let lvl2 = team ? team.filter(u => lvl1.some(p => p.id === u.referred_by)) : [];
+    let lvl3 = team ? team.filter(u => lvl2.some(p => p.id === u.referred_by)) : [];
+
+    // Calcul des revenus
+    let r1 = 0, r2 = 0, r3 = 0;
+    commissions?.forEach(c => {
+        if(lvl1.some(u => u.id === c.from_user)) r1 += c.amount;
+        if(lvl2.some(u => u.id === c.from_user)) r2 += c.amount;
+        if(lvl3.some(u => u.id === c.from_user)) r3 += c.amount;
+    });
+
+    // Mise à jour de l'interface en XOF
+    document.getElementById("teamCount").innerText = lvl1.length + lvl2.length + lvl3.length;
+    document.getElementById("totalCom").innerText = (r1 + r2 + r3).toLocaleString() + " XOF";
+
+    document.getElementById("l1Count").innerText = lvl1.length;
+    document.getElementById("l1Rev").innerText = r1.toLocaleString() + " XOF";
+
+    document.getElementById("l2Count").innerText = lvl2.length;
+    document.getElementById("l2Rev").innerText = r2.toLocaleString() + " XOF";
+
+    document.getElementById("l3Count").innerText = lvl3.length;
+    document.getElementById("l3Rev").innerText = r3.toLocaleString() + " XOF";
+}
+
+function copyLink() {
+    const link = document.getElementById("refLink").innerText;
+    // Sécurité au cas où le lien n'est pas encore chargé
+    if (link.includes("Chargement")) return; 
+    
+    navigator.clipboard.writeText(link);
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 2500);
+}
+
+loadData();
+</script>
+
+</body>
+</html>
