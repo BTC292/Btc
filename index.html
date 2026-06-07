@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC_IPHONE | Inscription Premium</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+/* NOUVELLE PALETTE DE COULEURS : Tech, Apple & Bitcoin */
+:root {
+    --bg-dark: #0b0f19; /* Fond sombre bleuté futuriste */
+    --card-bg: rgba(255, 255, 255, 0.03); /* Effet verre / Glassmorphism */
+    --card-border: rgba(255, 255, 255, 0.08);
+    --btc-orange: #f7931a; /* Orange Bitcoin officiel */
+    --iphone-blue: #0071e3; /* Bleu Apple */
+    --tech-gradient: linear-gradient(135deg, #f7931a, #ff5e62, #0071e3);
+    --text-white: #f5f5f7; /* Blanc Apple */
+    --text-gray: #86868b; /* Gris Apple */
+    --error: #ff453a; /* Rouge iOS */
+}
+
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.022em;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+    background-image: radial-gradient(circle at 80% 20%, rgba(247, 147, 26, 0.15), transparent 40%),
+                      radial-gradient(circle at 20% 80%, rgba(0, 113, 227, 0.15), transparent 40%);
+}
+
+/* CONTAINER EN EFFET DE VERRE (GLASSMORPHISM) */
+.container {
+    padding: 40px 30px;
+    max-width: 440px;
+    margin: 40px auto;
+    width: 90%;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.title h1 {
+    font-size: 28px;
+    margin: 0;
+    background: var(--tech-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* LOGO CYBER / TECH */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 80px;
+    filter: drop-shadow(0px 4px 15px rgba(247, 147, 26, 0.4));
+    margin-bottom: 5px;
+}
+
+/* FORMULAIRES STYLE APPLE PRIVACY */
+.input-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.input, .phone-box {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: var(--text-white);
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.input:focus, .phone-box:focus-within {
+    border-color: var(--btc-orange);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(247, 147, 26, 0.15);
+}
+
+/* Style spécifique quand le parrain est verrouillé automatiquement */
+.input:read-only {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(0, 113, 227, 0.4);
+    color: var(--text-gray);
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
+
+/* ENTRÉE TÉLÉPHONE */
+.phone-box {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 56px;
+}
+
+.country-select {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--btc-orange);
+    user-select: none;
+    min-width: 65px;
+}
+
+.divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 15px;
+}
+
+.phone-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: white;
+    outline: none;
+    font-size: 16px;
+    padding: 0;
+}
+
+/* MENU DÉROULANT PAYS MODERNE */
+.dropdown {
+    display: none;
+    background: #111622;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    margin-top: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.dropdown div {
+    padding: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s, color 0.2s;
+    font-size: 15px;
+}
+
+.dropdown div:hover {
+    background: var(--btc-orange);
+    color: #000;
+    font-weight: 600;
+}
+
+/* ICÔNE PASSWORD */
+.pass-box {
+    position: relative;
+}
+
+.eye {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-gray);
+    transition: color 0.2s;
+    font-size: 18px;
+}
+
+.eye:hover {
+    color: var(--btc-orange);
+}
+
+/* BOUTON FUTURISTE */
+button {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 16px;
+    background: var(--tech-gradient);
+    background-size: 200% auto;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(247, 147, 26, 0.3);
+}
+
+button:hover {
+    background-position: right center;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    background: var(--text-gray);
+    box-shadow: none;
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* LIENS */
+.link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.link a {
+    color: var(--iphone-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-shadow 0.2s;
+}
+
+.link a:hover {
+    text-decoration: underline;
+}
+
+/* ERREUR DESIGN iOS */
+.error {
+    color: var(--error);
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    min-height: 20px;
+    font-weight: 500;
+}
+
+/* TOAST CHIC STYLE D'ALERTE D'IPHONE */
+.toast {
+    position: fixed;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%, 0);
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000;
+    backdrop-filter: blur(10px);
+    padding: 14px 28px;
+    border-radius: 30px;
+    display: none;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { top: -10%; opacity: 0; }
+    to { top: 5%; opacity: 1; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LOGO BITCOIN TECH -->
+    <div class="logo">
+        <svg width="60" height="60" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24.78 12.44c.42-2.82-1.73-4.34-4.68-5.36l.96-3.84-2.34-.58-.93 3.75c-.62-.15-1.25-.3-1.87-.44l.94-3.77-2.34-.58-.96 3.84c-.51-.12-1.01-.23-1.5-.35l.01-.03-3.23-.8-.62 2.5s1.74.4 1.7.42c.95.24 1.12.87 1.09 1.37l-1.1 4.4c.07.02.15.04.24.07l-.24-.06-1.54 6.17c-.12.29-.41.73-1.07.56.02.03-1.7-.42-1.7-.42l-1.15 2.66 3.05.76c.57.14 1.12.29 1.67.42l-.97 3.91 2.34.58.96-3.86c.64.17 1.26.33 1.87.48l-.95 3.82 2.34.58.97-3.91c4 4 .76 1.13 6.95.26 1.83-.35 3.2-1.35 3.12-4.08-.01-1.99-1.23-3.14-2.73-3.66 1.09-.25 1.92-.97 2.14-2.46zM19.9 20c-.72 2.92-5.63 1.34-7.22.95l1.29-5.17c1.59.4 6.67 1.18 5.93 4.22zm.73-7.44c-.66 2.66-4.75 1.31-6.08.98l1.17-4.7c1.33.33 5.58.94 4.91 3.72z" fill="#f7931a"/>
+        </svg>
+    </div>
+
+    <div class="title">
+        <h1>BTC & IPHONE PREMIUM</h1>
+    </div>
+
+    <!-- NOM -->
+    <div class="input-group">
+        <input class="input" id="name" placeholder="Nom complet">
+    </div>
+
+    <!-- PHONE -->
+    <div class="input-group">
+        <div class="phone-box">
+            <div class="country-select" onclick="toggleDropdown()">
+                <span id="selectedCountry">+226</span>
+                <span>▼</span>
+            </div>
+            <div class="divider"></div>
+            <input type="number" id="phone" placeholder="Numéro de téléphone">
+        </div>
+        
+        <!-- LISTE MULTI-PAYS MODIFIABLE -->
+        <div class="dropdown" id="dropdownList">
+            <div onclick="selectCountry('+226')">🇧🇫 Burkina Faso (+226)</div>
+            <div onclick="selectCountry('+225')">🇨🇮 Côte d'Ivoire (+225)</div>
+            <div onclick="selectCountry('+223')">🇲🇱 Mali (+223)</div>
+            <div onclick="selectCountry('+227')">🇳🇪 Niger (+227)</div>
+            <div onclick="selectCountry('+228')">🇹🇬 Togo (+228)</div>
+            <div onclick="selectCountry('+229')">🇧🇯 Bénin (+229)</div>
+            <div onclick="selectCountry('+221')">🇸🇳 Sénégal (+221)</div>
+        </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="input-group pass-box">
+        <input class="input" type="password" id="pass" placeholder="Mot de passe">
+        <span class="eye" onclick="togglePass('pass')">👁️</span>
+    </div>
+
+    <!-- CONFIRM -->
+    <div class="input-group pass-box">
+        <input class="input" type="password" id="confirm" placeholder="Confirmer mot de passe">
+        <span class="eye" onclick="togglePass('confirm')">👁️</span>
+    </div>
+
+    <!-- REF (CODE PARRAIN AUTOMATIQUE) -->
+    <div class="input-group">
+        <input class="input" id="referral" placeholder="Code d'invitation (Optionnel)" style="border-style: dashed;">
+    </div>
+
+    <div class="error" id="msg"></div>
+
+    <button id="btn" onclick="register()">Créer mon compte</button>
+
+    <div class="link">
+        Déjà membre ? <a href="login.html">Connectez-vous ici</a>
+    </div>
+
+</div>
+
+<!-- TOAST (STYLE NOTIFICATION IPHONE) -->
+<div class="toast" id="toast">📲 Bienvenue sur BTC_IPHONE !</div>
+
+<script>
+/* CONFIG SUPABASE */
+const { createClient } = supabase;
+const client = createClient(
+    "https://ycswpdydsgoqplkqtpsd.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inljc3dwZHlkc2dvcXBsa3F0cHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NjY4MTcsImV4cCI6MjA5MDU0MjgxN30.67bBMdHtcGFIJuZuY_Xd4hBN4hj86JjHVXGN3oPbKMA"
+);
+
+let country_code = "+226";
+
+function toggleDropdown(){
+    let list = document.getElementById("dropdownList");
+    list.style.display = list.style.display === "block" ? "none" : "block";
+}
+
+function selectCountry(code){
+    country_code = code;
+    document.getElementById("selectedCountry").innerText = code;
+    document.getElementById("dropdownList").style.display = "none";
+}
+
+// Ferme la liste des pays si on clique en dehors
+document.addEventListener("click", function(event) {
+    let selectZone = document.querySelector(".country-select");
+    let list = document.getElementById("dropdownList");
+    if (!selectZone.contains(event.target)) {
+        list.style.display = "none";
+    }
+});
+
+function togglePass(id){
+    let input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+function showToast(){
+    let t = document.getElementById("toast");
+    t.style.display = "block";
+    setTimeout(()=>{ t.style.display="none"; },2500);
+}
+
+async function register(){
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+    let pass = document.getElementById("pass").value;
+    let confirm = document.getElementById("confirm").value;
+    let referral = document.getElementById("referral").value;
+    let msg = document.getElementById("msg");
+    let btn = document.getElementById("btn");
+
+    msg.innerText = "";
+
+    if(!name || !phone || !pass){
+        msg.innerText = "Veuillez remplir tous les champs obligatoires.";
+        return;
+    }
+
+    if(pass !== confirm){
+        msg.innerText = "Les mots de passe ne correspondent pas.";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Connexion sécurisée...";
+
+    try {
+        const { error } = await client.rpc("register_user", {
+            p_full_name: name,
+            p_country_code: country_code,
+            p_phone: phone,
+            p_password: pass,
+            p_referral_code: referral || null
+        });
+
+        if(error) throw error;
+
+        showToast();
+        setTimeout(()=>{
+            window.location.href = "login.html";
+        }, 2500);
+
+    } catch(err) {
+        msg.innerText = "Erreur : " + err.message;
+        btn.disabled = false;
+        btn.innerText = "Créer mon compte";
+    }
+}
+
+// GESTION AUTOMATIQUE DU LIEN DE PARRAINAGE AU CHARGEMENT
+window.onload = function(){
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref"); // Récupère le paramètre '?ref=' dans l'URL
+    
+    if(ref) {
+        let refInput = document.getElementById("referral");
+        refInput.value = ref; // Remplit automatiquement le champ parrain
+        refInput.readOnly = true; // Sécurise le champ en lecture seule
+        refInput.style.borderStyle = "solid"; 
+    }
+}
+</script>
+
+</body>
+</html>

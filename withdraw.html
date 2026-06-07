@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC_IPHONE | Retrait</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        /* PALETTE DE COULEURS BTC_IPHONE */
+        :root {
+            --bg-dark: #090b11;
+            --bg-gradient: linear-gradient(180deg, #121622 0%, #06070a 100%);
+            --card-dark: #121520;
+            --orange-primary: #ff6a3d;
+            --text-main: #ffffff;
+            --text-muted: #6b7588;
+            --accent-gradient: linear-gradient(135deg, #ff6a3d 0%, #9a4eff 100%);
+            --danger: #ff4d6d;
+            --success: #10b981;
+            --input-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        body { 
+            margin: 0; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark); 
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main); 
+            padding: 20px; 
+        }
+
+        /* HEADER */
+        .header { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            padding-top: 10px;
+        }
+        .back-btn { 
+            font-size: 24px; 
+            color: var(--orange-primary); 
+            cursor: pointer; 
+            margin-right: 15px; 
+            text-decoration: none; 
+            font-weight: bold;
+        }
+
+        /* CARTE DE SOLDE DISPONIBLE */
+        .balance-card {
+            background: var(--card-dark);
+            padding: 22px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            text-align: center; 
+            margin-bottom: 25px;
+        }
+        .balance-card span { 
+            color: var(--text-muted); 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            font-weight: 700;
+        }
+        .balance-card h2 { 
+            margin: 8px 0 0; 
+            font-size: 30px; 
+            font-weight: 900; 
+            color: #fff;
+        }
+
+        /* BANNIÈRE DE RETRAIT CONTAINER */
+        .withdraw-card { 
+            background: var(--card-dark); 
+            border-radius: 24px; 
+            padding: 25px; 
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+        }
+
+        .section-label { 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            margin-bottom: 12px; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+        }
+
+        /* GRILLE DE SÉLECTION DES OPÉRATEURS */
+        .operator-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            margin-bottom: 25px; 
+        }
+        .op-item {
+            background: rgba(0, 0, 0, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; 
+            padding: 12px 8px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+        .op-item img { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 10px; 
+            margin-bottom: 6px; 
+            object-fit: cover; 
+        }
+        .op-item span { 
+            display: block; 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            font-weight: 600;
+        }
+        .op-item.active { 
+            border-color: var(--orange-primary); 
+            background: rgba(255, 106, 61, 0.08); 
+        }
+        .op-item.active span { 
+            color: var(--orange-primary); 
+            font-weight: 800; 
+        }
+
+        /* FORMULAIRES CHIPS */
+        input {
+            width: 100%; 
+            padding: 16px; 
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 14px;
+            color: white; 
+            font-size: 15px; 
+            margin-bottom: 22px; 
+            box-sizing: border-box; 
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus { 
+            border-color: var(--orange-primary); 
+            background: rgba(0, 0, 0, 0.3); 
+        }
+
+        /* RÉSUMÉ FINANCIER */
+        .summary-box {
+            background: rgba(0, 0, 0, 0.15); 
+            border-radius: 16px; 
+            padding: 16px;
+            margin-bottom: 25px; 
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .summary-line { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 10px; 
+            font-size: 13px; 
+            color: var(--text-muted);
+        }
+        .summary-line span:last-child {
+            color: #fff;
+            font-weight: 600;
+        }
+        .summary-total { 
+            border-top: 1px solid rgba(255, 255, 255, 0.05); 
+            padding-top: 12px; 
+            margin-top: 8px; 
+            font-weight: 800; 
+            font-size: 15px; 
+        }
+        .summary-total span:last-child {
+            color: var(--success) !important;
+            font-size: 16px;
+        }
+
+        /* BOUTON DE RETRAIT DÉGRADÉ */
+        .btn-withdraw {
+            width: 100%; 
+            padding: 18px; 
+            background: var(--accent-gradient);
+            border: none; 
+            border-radius: 16px; 
+            color: #ffffff; 
+            font-weight: 800;
+            font-size: 15px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(255, 106, 61, 0.2);
+        }
+        .btn-withdraw:active { transform: scale(0.97); opacity: 0.9; }
+        .btn-withdraw:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; }
+
+        .footer-note { 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            text-align: center; 
+            margin-top: 22px; 
+            line-height: 1.6; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <a href="account.html" class="back-btn">‹</a>
+    <div style="font-size: 17px; font-weight: 800; letter-spacing: 0.5px;">RETRAIT PORTEFEUILLE</div>
+</div>
+
+<div class="balance-card">
+    <span>Solde Disponible</span>
+    <h2 id="balanceText">0 XOF</h2>
+</div>
+
+<div class="withdraw-card">
+    <div class="section-label">Sélectionner l'opérateur</div>
+    <div class="operator-grid">
+        <div class="op-item" onclick="selectOp('Orange Money', this)">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange">
+            <span>Orange</span>
+        </div>
+        <div class="op-item" onclick="selectOp('Moov Money', this)">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Moov_Africa_Logo.svg" alt="Moov" style="background:#fff; padding:2px; box-sizing:border-box;">
+            <span>Moov</span>
+        </div>
+        <div class="op-item" onclick="selectOp('Wave', this)">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Wave_logo.svg" alt="Wave">
+            <span>Wave</span>
+        </div>
+    </div>
+
+    <div class="section-label">Numéro de téléphone bénéficiaire</div>
+    <input type="tel" id="phone" placeholder="Ex: 0700000000">
+
+    <div class="section-label">Montant du retrait (Min 1 000 XOF)</div>
+    <input type="number" id="amount" placeholder="Entrez le montant" oninput="calculateFees()">
+
+    <div class="summary-box" id="summaryBox">
+        <div class="summary-line"><span>Montant brut</span> <span id="resBrut">0 XOF</span></div>
+        <div class="summary-line"><span>Frais réseau (7%)</span> <span id="resFrais" style="color:var(--danger) !important;">- 0 XOF</span></div>
+        <div class="summary-line summary-total"><span>Net à recevoir</span> <span id="resNet">0 XOF</span></div>
+    </div>
+
+    <button class="btn-withdraw" id="btnAction" onclick="processWithdrawal()">Demander le retrait</button>
+    
+    <div class="footer-note">
+        Traitement manuel sécurisé sous un délai de <b>1h à 24h</b>.<br>
+        Vérifiez scrupuleusement vos informations réseau avant de valider.
+    </div>
+</div>
+
+<script>
+const client = supabase.createClient(
+    "https://ycswpdydsgoqplkqtpsd.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inljc3dwZHlkc2dvcXBsa3F0cHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NjY4MTcsImV4cCI6MjA5MDU0MjgxN30.67bBMdHtcGFIJuZuY_Xd4hBN4hj86JjHVXGN3oPbKMA"
+);
+const uid = localStorage.getItem("user_id");
+let balance = 0;
+let selectedOperator = "";
+
+async function fetchBalance() {
+    if(!uid) return;
+    const { data } = await client.from("users").select("balance").eq("id", uid).single();
+    if(data) {
+        balance = data.balance;
+        document.getElementById("balanceText").innerText = balance.toLocaleString() + " XOF";
+    }
+}
+
+function selectOp(name, el) {
+    document.querySelectorAll('.op-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+    selectedOperator = name;
+}
+
+function calculateFees() {
+    const amt = parseFloat(document.getElementById("amount").value) || 0;
+    const fees = Math.round(amt * 0.07);
+    const net = amt - fees;
+
+    document.getElementById("resBrut").innerText = amt.toLocaleString() + " XOF";
+    document.getElementById("resFrais").innerText = "- " + fees.toLocaleString() + " XOF";
+    document.getElementById("resNet").innerText = (net > 0 ? net : 0).toLocaleString() + " XOF";
+}
+
+async function processWithdrawal() {
+    const amt = parseInt(document.getElementById("amount").value);
+    const tel = document.getElementById("phone").value;
+    const btn = document.getElementById("btnAction");
+
+    if(!selectedOperator) { alert("Veuillez choisir un opérateur réseau."); return; }
+    if(!tel || tel.length < 8) { alert("Numéro de téléphone incomplet ou invalide."); return; }
+    if(!amt || amt < 1000) { alert("Le montant minimum de retrait est de 1 000 XOF."); return; }
+    if(amt > balance) { alert("Solde disponible insuffisant pour cette opération."); return; }
+
+    btn.disabled = true;
+    btn.innerText = "Traitement sécurisé...";
+
+    try {
+        // Débiter le solde de la table users
+        const { error: errUpd } = await client.from("users").update({ balance: balance - amt }).eq("id", uid);
+        if(errUpd) throw errUpd;
+
+        // Insérer l'enregistrement dans la table transactions
+        const { error: errIns } = await client.from("transactions").insert([{
+            user_id: uid, 
+            amount: amt, 
+            type: 'withdraw', 
+            status: 'En attente',
+            description: `Retrait ${selectedOperator} vers ${tel}`
+        }]);
+        if(errIns) throw errIns;
+
+        alert("✅ Demande transmise avec succès ! Votre retrait est en cours d'analyse.");
+        location.href = "account.html"; // Redirection vers le profil / portefeuille mis à jour
+    } catch (e) {
+        alert("Erreur réseau : " + e.message);
+        btn.disabled = false;
+        btn.innerText = "Demander le retrait";
+    }
+}
+
+fetchBalance();
+</script>
+</body>
+</html>
