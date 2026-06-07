@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC_IPHONE | Produits</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+/* CHARTE GRAPHIQUE COMPATIBLE : Tech, Apple & Bitcoin */
+:root {
+    --bg-dark: #090b11;
+    --bg-gradient: linear-gradient(180deg, #121622 0%, #06070a 100%);
+    --card-bg: #121520;
+    --card-border: rgba(255, 255, 255, 0.05);
+    --btc-orange: #ff6a3d;
+    --iphone-blue: #9a4eff;
+    --tech-gradient: linear-gradient(135deg, #ff6a3d 0%, #9a4eff 100%);
+    --text-white: #ffffff;
+    --text-gray: #6b7588;
+    --success: #10b981;
+    --error: #ff4d6d;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.022em;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-dark);
+    background-image: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-white);
+    padding-bottom: 100px;
+}
+
+/* HEADER */
+.header {
+    padding: 25px 20px;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-white);
+    border-bottom: 1px solid var(--card-border);
+}
+
+/* FILTRE DE SELECTION PREMIUM */
+.filter {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.filter div {
+    padding: 10px 24px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-gray);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.filter div.active-filter {
+    background: var(--tech-gradient);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(255, 106, 61, 0.2);
+}
+
+/* CONTAINER PRINCIPAL */
+.container {
+    padding: 0 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* CARDS STRUCTURÉES */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.top {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+.vip-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 18px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.info div { margin-bottom: 6px; }
+.info b { color: var(--text-white); font-weight: 700; }
+
+/* BLOCS DE RENDEMENT TECHNIQUES */
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px 8px;
+    border-radius: 14px;
+    font-size: 11px;
+    flex: 1;
+    text-align: center;
+    color: var(--text-gray);
+    border: 1px solid var(--card-border);
+    font-weight: 600;
+}
+
+.box b {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--btc-orange);
+    font-weight: 800;
+}
+
+/* BOUTON D'ACTION */
+.btn {
+    margin-top: 18px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    background: var(--tech-gradient);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(255, 106, 61, 0.2);
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #ffffff;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn:disabled {
+    background: #2a2e3d !important;
+    color: var(--text-gray) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+}
+
+/* BARRE DE NAVIGATION FINE BTC_IPHONE */
+.menu-bottom {
+    position: fixed; 
+    bottom: 0; 
+    width: 100%;
+    background: #0b0e17; 
+    display: flex; 
+    justify-content: space-around;
+    padding: 12px 0 28px; 
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 1000;
+}
+
+.menu-item-nav { 
+    color: var(--text-gray); 
+    text-align: center; 
+    font-size: 11px; 
+    text-decoration: none; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.menu-item-nav.active { color: var(--btc-orange); }
+.menu-item-nav span { display: block; font-size: 20px; font-style: normal; }
+
+/* NOTIFICATIONS iOS */
+.toast {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 14px 28px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 9999;
+    color: white;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+}
+
+.toast.show { opacity: 1; top: 30px; }
+.toast.success { background: rgba(16, 185, 129, 0.95); border: 1px solid rgba(16, 185, 129, 0.3); }
+.toast.error { background: rgba(255, 77, 109, 0.95); border: 1px solid rgba(255, 77, 109, 0.3); }
+.toast.info { background: rgba(154, 78, 255, 0.95); border: 1px solid rgba(154, 78, 255, 0.3); }
+</style>
+</head>
+
+<body>
+
+<div class="header">Plans d'Investissement</div>
+
+<div class="filter">
+    <div id="btnAll" class="active-filter" onclick="setFilter('all')">Tous les Plans</div>
+    <div id="btnOwned" onclick="setFilter('owned')">Mes Souscriptions</div>
+</div>
+
+<div class="container" id="plans">
+    <div style="text-align:center; padding:50px; color: var(--text-gray);">Chargement des machines de minage...</div>
+</div>
+
+<div class="menu-bottom">
+    <div class="menu-item-nav" onclick="location.href='dashboard.html'"><span>🏠</span>Accueil</div>
+    <div class="menu-item-nav active"><span>🎓</span>Investir</div>
+    <div class="menu-item-nav" onclick="location.href='team.html'"><span>👥</span>Équipe</div>
+    <div class="menu-item-nav" onclick="location.href='account.html'"><span>👤</span>Profil</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const supabaseClient = supabase.createClient(
+    "https://ycswpdydsgoqplkqtpsd.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inljc3dwZHlkc2dvcXBsa3F0cHNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NjY4MTcsImV4cCI6MjA5MDU0MjgxN30.67bBMdHtcGFIJuZuY_Xd4hBN4hj86JjHVXGN3oPbKMA"
+);
+
+// Liens des nouvelles images générées pour les produits
+const images = [
+    "https://lh3.googleusercontent.com/d/1_9iN1D7v4Z50nIor-e0P8S26_A6NfC7O", 
+    "https://lh3.googleusercontent.com/d/1A-E03A1wM50N-68Xb6yG8r9P0C4_zFwV", 
+    "https://lh3.googleusercontent.com/d/1N3_A6P7C4z5V0N68xb6_yG8r9P0C4zFw"
+];
+
+let ownedVIPs = [];
+let allPlans = [];
+let currentFilter = "all";
+
+function format(x) {
+    return Number(x).toLocaleString() + " XOF";
+}
+
+function showToast(message, type = "info") {
+    let toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.className = "toast show " + type;
+    setTimeout(() => { toast.classList.remove("show"); }, 3000);
+}
+
+async function loadUserVIPs(user_id) {
+    const { data } = await supabaseClient
+        .from("user_vips")
+        .select("vip_id")
+        .eq("user_id", user_id);
+    
+    if (data) ownedVIPs = data.map(v => v.vip_id);
+}
+
+async function loadPlans() {
+    let user_id = localStorage.getItem("user_id");
+    if (!user_id) {
+        showToast("Session expirée. Veuillez vous reconnecter.", "error");
+        return;
+    }
+
+    await loadUserVIPs(user_id);
+
+    const { data } = await supabaseClient
+        .from("vip_plans")
+        .select("*")
+        .order("price", { ascending: true });
+
+    if (data) {
+        allPlans = data;
+        renderPlans();
+    }
+}
+
+function renderPlans() {
+    let container = document.getElementById("plans");
+    container.innerHTML = "";
+
+    let filtered = currentFilter === "owned"
+        ? allPlans.filter(p => ownedVIPs.includes(p.id))
+        : allPlans;
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style='text-align:center;color:var(--text-gray);margin-top:50px;'>
+            ${currentFilter === 'owned' ? 'Vous n’avez pas encore d’investissement actif.' : 'Aucun produit disponible.'}
+        </div>`;
+        return;
+    }
+
+    filtered.forEach((plan, index) => {
+        let img = images[index % images.length];
+        let owned = ownedVIPs.includes(plan.id);
+        let totalIncome = plan.daily_income * plan.cycle_days;
+        
+        // Vérification de la colonne d'activation (par défaut true si manquante)
+        let isPlanActive = plan.is_active !== false && plan.is_active !== "false";
+
+        let card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="top" style="${!isPlanActive ? 'opacity: 0.5;' : ''}">
+                <img src="${img}" class="vip-img">
+                <div class="info">
+                    <div>Prix : <b>${format(plan.price)}</b></div>
+                    <div>Gains / Jour : <b style="color:var(--success);">${format(plan.daily_income)}</b></div>
+                    <div>Cycle : <b>${plan.cycle_days} jours</b></div>
+                </div>
+            </div>
+            <div class="bottom" style="${!isPlanActive ? 'opacity: 0.5;' : ''}">
+                <div class="box">Machine<b>${plan.name}</b></div>
+                <div class="box">Total<b>${format(totalIncome)}</b></div>
+                <div class="box">Profit<b>+${Math.round((totalIncome / plan.price) * 100)}%</b></div>
+            </div>
+            
+            <button class="btn" id="btn-${plan.id}" onclick="buy('${plan.id}')" ${!isPlanActive ? "disabled" : ""}>
+                <span>${!isPlanActive ? "Bientôt disponible" : (owned ? "Re-souscrire (Acheter à nouveau)" : "Investir maintenant")}</span>
+                ${isPlanActive ? `<svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>` : ''}
+            </button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function setFilter(type) {
+    currentFilter = type;
+    document.getElementById("btnAll").classList.toggle("active-filter", type === 'all');
+    document.getElementById("btnOwned").classList.toggle("active-filter", type === 'owned');
+    renderPlans();
+}
+
+async function buy(vip_id) {
+    let user_id = localStorage.getItem("user_id");
+    let btn = document.getElementById("btn-" + vip_id);
+
+    if (!confirm("Confirmez-vous ce nouvel investissement ?")) return;
+
+    btn.disabled = true;
+    btn.innerText = "Traitement de la transaction...";
+
+    const { error } = await supabaseClient.rpc("buy_vip", {
+        p_user_id: user_id,
+        p_vip_id: vip_id
+    });
+
+    if (error) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Investir maintenant</span><svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>`;
+        
+        // Gestion stricte du texte d'erreur pour le solde insuffisant
+        if (error.message.toLowerCase().includes("solde") || error.message.toLowerCase().includes("balance")) {
+            showToast("Solde insuffisant", "error");
+        } else {
+            showToast("Erreur système. Réessayez.", "error");
+        }
+        return;
+    }
+
+    if (!ownedVIPs.includes(vip_id)) {
+        ownedVIPs.push(vip_id);
+    }
+    
+    showToast("Investissement validé avec succès !", "success");
+    
+    setTimeout(() => {
+        btn.disabled = false;
+        renderPlans();
+    }, 1000);
+}
+
+loadPlans();
+</script>
+
+</body>
+</html>
